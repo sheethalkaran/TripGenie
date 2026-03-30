@@ -77,26 +77,26 @@ Repository (GeminiRepository)
 FastAPI Backend
 ```
 
-**UI Layer** — Compose screens observe StateFlow from the ViewModel with no business logic.
+- **UI Layer** — Compose screens observe StateFlow from the ViewModel with no business logic.
 
-**ViewModel Layer** — `MainViewModel` holds all UI state as `StateFlow<UiState<T>>` with four states: `Idle`, `Loading`, `Success`, and `Error`. Handles form updates, triggers API calls, and manages saved trips.
+- **ViewModel Layer** — `MainViewModel` holds all UI state as `StateFlow<UiState<T>>` with four states: `Idle`, `Loading`, `Success`, and `Error`. Handles form updates, triggers API calls, and manages saved trips.
 
-**Repository Layer** — `GeminiRepository` is the single point for all backend communication. It sends POST requests, parses JSON responses, and throws typed exceptions on failure.
+- **Repository Layer** — `GeminiRepository` is the single point for all backend communication. It sends POST requests, parses JSON responses, and throws typed exceptions on failure.
 
-**Data Layer** — Kotlin data classes mirror the backend Pydantic models exactly, ensuring consistent serialization.
+- **Data Layer** — Kotlin data classes mirror the backend Pydantic models exactly, ensuring consistent serialization.
 
 
 ## Key Screens
 
-**Itinerary** — User enters destination, days, budget, traveler type, and interests. The app calls `/itinerary` and displays a day-by-day timeline with activity times, locations, and costs.
+- **Itinerary** — User enters destination, days, budget, traveler type, and interests. The app calls `/itinerary` and displays a day-by-day timeline with activity times, locations, and costs.
 
-**Packing** — Calls `/packing` and renders a categorized checklist (Clothing, Footwear, Toiletries, Electronics, Documents, Health) with a live progress bar showing the percentage packed.
+- **Packing** — Calls `/packing` and renders a categorized checklist (Clothing, Footwear, Toiletries, Electronics, Documents, Health) with a live progress bar showing the percentage packed.
 
-**Food** — Calls `/food` and shows a 2-column card grid with dish name, restaurant, description, and best spot for the selected region. "Load More" fetches additional dishes excluding already shown ones.
+- **Food** — Calls `/food` and shows a 2-column card grid with dish name, restaurant, description, and best spot for the selected region. "Load More" fetches additional dishes excluding already shown ones.
 
-**Chatbot** — Floating overlay accessible from any screen. Sends message history to `/chat` and displays the conversation with Concierge Genie.
+- **Chatbot** — Floating overlay accessible from any screen. Sends message history to `/chat` and displays the conversation with Concierge Genie.
 
-**Saved Trips** — Persists generated itineraries to `SharedPreferences` as JSON. No internet needed to view saved trips.
+- **Saved Trips** — Persists generated itineraries to `SharedPreferences` as JSON. No internet needed to view saved trips.
 
 
 ## Troubleshooting

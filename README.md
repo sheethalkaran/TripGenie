@@ -54,8 +54,6 @@ FastAPI Backend (Python) — deployed on Render
 Google Gemini API
 ```
 
-*Note: The Gemini API key is stored only on the backend server. It is never bundled inside the APK.*
-
 ## How It Works
 1. User enters trip details in the Android app.
 2. The app sends requests to the backend (deployed on Render or locally).
