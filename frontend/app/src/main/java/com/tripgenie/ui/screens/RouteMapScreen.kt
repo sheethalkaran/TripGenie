@@ -51,7 +51,7 @@ fun RouteMapScreen(result: ItineraryResult, onBack: () -> Unit) {
         // Header
         Row(
             modifier = Modifier.fillMaxWidth().background(Color.White)
-                .padding(start = 4.dp, end = 16.dp, top = 6.dp, bottom = 6.dp),
+                .padding(start = 4.dp, end = 16.dp, top = 16.dp, bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {

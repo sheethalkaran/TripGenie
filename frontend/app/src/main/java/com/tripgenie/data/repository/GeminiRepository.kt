@@ -15,7 +15,7 @@ class GeminiRepository {
 
     // ── CHANGE THIS to your Render URL after deploying ───────────────────────
     // Example: "https://tripgenie-backend.onrender.com"
-    private val BASE_URL = "https://tripgenie-backend.onrender.com"
+    private val BASE_URL = "https://tripgenie-backend-1nb5.onrender.com"
     // ────────────────────────────────────────────────────────────────────────
 
     private val client = OkHttpClient.Builder()

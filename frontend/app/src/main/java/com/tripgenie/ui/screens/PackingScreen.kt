@@ -51,7 +51,7 @@ fun PackingScreen(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-            start = 16.dp, end = 16.dp, top = 4.dp, bottom = 120.dp
+            start = 16.dp, end = 16.dp, top = 16.dp, bottom = 120.dp
         ),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {

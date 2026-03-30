@@ -1,14 +1,24 @@
 # Android/IntelliJ/Gradle related
+
+# IDE and project files
 /.idea/
+/.idea/*
 /.gradle/
+/.gradle/*
+/.kotlin/
+/.kotlin/sessions/
 /local.properties
 /.DS_Store
+*.iml
+
+# Build and generated files
 /build/
 /captures/
 .externalNativeBuild/
 .cxx/
-*.iml
-.gradle/
+app/build/
+app/release/
+app/debug/
 
 # Android Studio Navigation editor temp files
 .navigation/
@@ -20,11 +30,13 @@
 # Log files
 *.log
 
-# Generated files
-app/build/
-app/release/
-app/debug/
+# Miscellaneous
+*.tmp
+*.bak
+*.swp
+*.class
+*.db
 
-# Misc
+# Generated files
 *.apk
 *.ap_
