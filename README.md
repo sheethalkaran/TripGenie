@@ -5,12 +5,12 @@ TripGenie is an AI-powered travel planning Android app that generates personaliz
 ## Screenshots
 
 <p align="center">
-        <img src="screenshots/form.png" width="160" alt="Itinerary Form"/>
-        <img src="screenshots/itinerary.png" width="160" alt="Itinerary Result"/>
-        <img src="screenshots/packing_items.png" width="160" alt="Packing List"/>
-        <img src="screenshots/local_foods.png" width="160" alt="Food Guide"/>
-        <img src="screenshots/chatbot.png" width="160" alt="Chatbot"/>
-        <img src="screenshots/saved_trips.png" width="160" alt="Saved Trips"/>
+        <img src="screenshots/form.png" width="250" alt="Itinerary Form"/>
+        <img src="screenshots/itinerary.png" width="250" alt="Itinerary Result"/>
+        <img src="screenshots/packing_items.png" width="250" alt="Packing List"/>
+        <img src="screenshots/local_foods.png" width="250" alt="Food Guide"/>
+        <img src="screenshots/chatbot.png" width="250" alt="Chatbot"/>
+        <img src="screenshots/saved_trips.png" width="250" alt="Saved Trips"/>
 </p>
 
 ## Features
@@ -72,4 +72,5 @@ TripGenie/
 ```
 
 See the `backend/README.md` and `frontend/README.md` files for setup instructions.
+
 
