@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.TripGenie" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#2D4DE0</item>
+        <item name="colorPrimaryVariant">#1EB8A6</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:statusBarColor">#2D4DE0</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+    </style>
+</resources>

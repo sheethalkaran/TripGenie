@@ -1,0 +1,30 @@
+# Android/IntelliJ/Gradle related
+/.idea/
+/.gradle/
+/local.properties
+/.DS_Store
+/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+*.iml
+.gradle/
+
+# Android Studio Navigation editor temp files
+.navigation/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Log files
+*.log
+
+# Generated files
+app/build/
+app/release/
+app/debug/
+
+# Misc
+*.apk
+*.ap_

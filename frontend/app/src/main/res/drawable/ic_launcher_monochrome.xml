@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Globe outline -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:fillColor="#00000000"
+        android:pathData="M54,20 a34,34 0 1,0 0.001,0 Z"/>
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.8"
+        android:fillColor="#00000000"
+        android:pathData="M22,54 Q54,40 86,54 M22,54 Q54,68 86,54 M54,20 Q40,54 54,88 M54,20 Q68,54 54,88"/>
+    <!-- Airplane -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,36 L58,45 L70,42 L70,47 L58,49 L56,59 L62,59 L62,63 L54,61 L46,63 L46,59 L52,59 L50,49 L38,47 L38,42 L50,45 Z"/>
+    <!-- Location pin -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,68 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M54,73 L54,82"/>
+</vector>
