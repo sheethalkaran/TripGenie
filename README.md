@@ -30,6 +30,4 @@ TripGenie is an AI-powered travel planning application that helps users generate
 - See `backend/README.md` for backend setup and deployment
 - See `frontend/README.md` for Android app setup and usage
 
----
-
 For more details, refer to the respective README files in each folder.
