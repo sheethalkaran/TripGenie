@@ -1,6 +1,6 @@
 # TripGenie
 
-TripGenie is an AI-powered travel planning Android app that generates personalized itineraries, packing lists, local food guides, and offers a travel assistant chatbot. The project consists of a FastAPI backend and a modern Android frontend built with Kotlin and Jetpack Compose.
+AI-powered travel planning Android app that generates personalized itineraries, packing lists, local food guides, and offers a travel assistant chatbot. The project consists of a FastAPI backend and a modern Android frontend built with Kotlin and Jetpack Compose.
 
 ## Screenshots
 
