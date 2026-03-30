@@ -1,33 +1,75 @@
 # TripGenie
 
-TripGenie is an AI-powered travel planning application that helps users generate personalized trip itineraries, packing lists, local food recommendations, and provides a travel assistant chatbot. The project consists of a FastAPI backend and a modern Android frontend built with Kotlin and Jetpack Compose.
+TripGenie is an AI-powered travel planning Android app that generates personalized itineraries, packing lists, local food guides, and offers a travel assistant chatbot. The project consists of a FastAPI backend and a modern Android frontend built with Kotlin and Jetpack Compose.
+
+## Screenshots
+
+<p align="center">
+        <img src="screenshots/form.png" width="160" alt="Itinerary Form"/>
+        <img src="screenshots/itinerary.png" width="160" alt="Itinerary Result"/>
+        <img src="screenshots/packing_items.png" width="160" alt="Packing List"/>
+        <img src="screenshots/local_foods.png" width="160" alt="Food Guide"/>
+        <img src="screenshots/chatbot.png" width="160" alt="Chatbot"/>
+        <img src="screenshots/saved_trips.png" width="160" alt="Saved Trips"/>
+</p>
 
 ## Features
-- Generate multi-day travel itineraries with real activities, locations, and budget breakdowns
-- Create weather and activity-specific packing lists
-- Discover authentic local foods and restaurants for any region
-- Chatbot assistant for travel tips, logistics, and local insights
+
+| Feature            | Description                                                                                 |
+|--------------------|---------------------------------------------------------------------------------------------|
+| Itinerary Generator| Day-by-day travel plan with real activities, GPS locations, and budget breakdown            |
+| Packing List       | Smart checklist with progress tracking, tailored to weather and activities                  |
+| Local Food Guide   | Authentic dishes and real restaurant recommendations for any region                         |
+| Travel Chatbot     | Concierge Genie — AI assistant for travel tips, logistics, and local insights               |
+| Saved Trips        | Save and revisit generated itineraries offline                                              |
+
+
 
 ## Tech Stack
-- **Backend:** Python, FastAPI, Google Gemini API, Pydantic
-- **Frontend:** Kotlin, Jetpack Compose, MVVM architecture, Coroutines, OkHttp
+
+**Frontend (Android):**
+- Kotlin, Jetpack Compose
+- MVVM architecture (ViewModel + StateFlow)
+- OkHttp for HTTP requests
+- Coroutines for async operations
+
+**Backend (Python):**
+- FastAPI
+- Google Generative AI SDK
+- Pydantic for request/response validation
+- Deployed on Render (free tier)
+- Automatic model fallback across Gemini versions
 
 ## Architecture
-- The backend exposes REST API endpoints for itinerary, packing, food, and chat features. All AI generation is handled server-side using Gemini models.
-- The frontend uses MVVM architecture. All API calls are made via a repository class to the backend. No API keys are stored in the app.
+
+```
+Android App (Kotlin + Jetpack Compose)
+        |
+        |  HTTP — OkHttp
+        v
+FastAPI Backend (Python) — deployed on Render
+        |
+        |  Google AI SDK
+        v
+Google Gemini API
+```
+
+*Note: The Gemini API key is stored only on the backend server. It is never bundled inside the APK.*
 
 ## How It Works
-1. User enters trip details in the Android app
-2. App sends requests to the backend (deployed on Render or locally)
-3. Backend generates responses using Gemini and returns structured JSON
-4. App displays results in a modern, responsive UI
+1. User enters trip details in the Android app.
+2. The app sends requests to the backend (deployed on Render or locally).
+3. The backend generates responses using Gemini and returns structured JSON.
+4. The app displays results in a modern, responsive UI.
 
-## Project Structure
-- `backend/` — FastAPI server, Gemini integration, REST endpoints
-- `frontend/` — Android app, MVVM, Compose UI, repository pattern
+## Repository Structure
 
-## Setup
-- See `backend/README.md` for backend setup and deployment
-- See `frontend/README.md` for Android app setup and usage
+```
+TripGenie/
+├── frontend/     # Android app — Kotlin, Jetpack Compose, MVVM
+├── backend/      # FastAPI server — Gemini integration, REST endpoints
+└── screenshots/  # App screenshots used in README
+```
 
-For more details, refer to the respective README files in each folder.
+See the `backend/README.md` and `frontend/README.md` files for setup instructions.
+
