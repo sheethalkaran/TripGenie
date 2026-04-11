@@ -30,6 +30,7 @@ app.add_middleware(
 # ── Model list (only real, working models) ───────────────────────────────────
 MODELS = [
     "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
     "gemini-1.5-flash",
     "gemini-2.5-flash",
 ]
@@ -195,7 +196,10 @@ Respond ONLY with valid JSON array (no markdown):
 
 @app.post("/food")
 async def generate_food(req: FoodRequest):
-    cache_key = make_cache_key(req.model_dump_json())
+    # Sort alreadyShown so order doesn't affect cache key
+    sorted_req = req.model_dump()
+    sorted_req["alreadyShown"] = sorted(sorted_req["alreadyShown"])
+    cache_key = make_cache_key(json.dumps(sorted_req, sort_keys=True))
     if cached := cache_get(cache_key):
         return {"result": cached}
 

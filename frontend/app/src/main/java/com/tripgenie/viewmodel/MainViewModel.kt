@@ -192,19 +192,24 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun loadMoreFoods() {
-        val region = _foodRegion.value.ifBlank { return }
-        _foodLoadMoreState.value = UiState.Loading
-        viewModelScope.launch {
-            try {
-                val new = repository.generateFoodInsights(region, shownFoodNames.toList())
-                shownFoodNames.addAll(new.map { it.name })
-                _foodItems.value += new
-                _foodLoadMoreState.value = UiState.Success(Unit)
-            } catch (e: Exception) {
-                _foodLoadMoreState.value = UiState.Error(e.message ?: "Failed")
-            }
+    val region = _foodRegion.value.ifBlank { return }
+    if (_foodLoadMoreState.value is UiState.Loading) return  // prevent double tap
+    _foodLoadMoreState.value = UiState.Loading
+    viewModelScope.launch {
+        try {
+            val new = repository.generateFoodInsights(region, shownFoodNames.toList())
+            shownFoodNames.addAll(new.map { it.name })
+            _foodItems.value = _foodItems.value + new
+            _foodLoadMoreState.value = UiState.Success(Unit)
+        } catch (e: Exception) {
+            _foodLoadMoreState.value = UiState.Error(e.message ?: "Failed")
+        } finally {
+            // Reset to Idle after short delay so button becomes clickable again
+            kotlinx.coroutines.delay(500)
+            _foodLoadMoreState.value = UiState.Idle
         }
     }
+}
 
     fun resetFood() { _foodState.value = UiState.Idle; _foodItems.value = emptyList() }
 

@@ -177,8 +177,8 @@ class GeminiRepository {
 
     suspend fun generateFoodInsights(region: String, alreadyShown: List<String> = emptyList()): List<FoodItem> {
         // Only cache the first-load (no alreadyShown) — "load more" should always be fresh
-        val cacheEnabled = alreadyShown.isEmpty()
-        val key = cacheKey("food", region)
+        val cacheEnabled = true
+        val key = cacheKey("food", region, alreadyShown.sorted().joinToString(","))
 
         if (cacheEnabled) {
             sessionCache[key]?.let { cached ->
