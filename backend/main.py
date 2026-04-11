@@ -94,17 +94,18 @@ class ChatRequest(BaseModel):
 
 # ── Gemini async helper ──────────────────────────────────────────────────────
 
-async def call_gemini(prompt: str) -> str:
+async def call_gemini(prompt: str, json_mode: bool = True) -> str:
     errors = []
     for model_name in MODELS:
         try:
+            config = genai.GenerationConfig(
+                temperature=0.3,
+                max_output_tokens=8192,
+                response_mime_type="application/json" if json_mode else "text/plain",
+            )
             model = genai.GenerativeModel(
                 model_name=model_name,
-                generation_config=genai.GenerationConfig(
-                    temperature=0.3,
-                    max_output_tokens=8192,
-                    response_mime_type="application/json",
-                ),
+                generation_config=config,
             )
             response = await model.generate_content_async(prompt)
             return response.text
@@ -240,5 +241,5 @@ async def chat(req: ChatRequest):
         "Give practical travel advice in 3-4 sentences.\n"
         f"{hist}\nUser: {req.message}"
     )
-    reply = await call_gemini(prompt)
+    reply = await call_gemini(prompt, json_mode=False)
     return {"reply": reply}
