@@ -20,9 +20,9 @@ class GeminiRepository {
     // ────────────────────────────────────────────────────────────────────────
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
+        .connectTimeout(90, TimeUnit.SECONDS)
+        .readTimeout(90, TimeUnit.SECONDS)
+        .writeTimeout(90, TimeUnit.SECONDS)
         .build()
 
     private val JSON_MEDIA = "application/json; charset=utf-8".toMediaType()
@@ -237,5 +237,15 @@ class GeminiRepository {
 
         val response = post("/chat", bodyJson)
         return JSONObject(response).getString("reply")
+    }
+
+    suspend fun pingServer() = withContext(Dispatchers.IO) {
+        runCatching {
+            val request = Request.Builder()
+                .url("$BASE_URL/health")
+                .get()
+                .build()
+            client.newCall(request).execute().close()
+        }
     }
 }

@@ -117,6 +117,14 @@ async def call_gemini(prompt: str) -> str:
 
 
 def clean_json(raw: str) -> str:
+    # Strip markdown code fences like ```json ... ``` or ``` ... ```
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[-1]  # remove first line (```json or ```)
+    if raw.endswith("```"):
+        raw = raw.rsplit("```", 1)[0]  # remove trailing ```
+    raw = raw.strip()
+    # Now find the actual JSON start/end
     start = next((i for i, c in enumerate(raw) if c in ('{', '[')), -1)
     end = next((i for i in range(len(raw) - 1, -1, -1) if raw[i] in ('}', ']')), -1)
     if start != -1 and end != -1 and end > start:

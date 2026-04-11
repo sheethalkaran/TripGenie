@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
+import androidx.core.content.edit
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -81,7 +82,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _viewingSavedTrip = MutableStateFlow<ItineraryResult?>(null)
     val viewingSavedTrip: StateFlow<ItineraryResult?> = _viewingSavedTrip.asStateFlow()
 
-    init { loadSavedTrips() }
+    init {
+        loadSavedTrips()
+        viewModelScope.launch {
+            try { repository.pingServer() } catch (_: Exception) {}
+        }
+    }
 
     private fun loadSavedTrips() {
         val json = prefs.getString("saved_trips", "[]") ?: "[]"
@@ -98,7 +104,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         )
         val updated = _savedTrips.value + trip
         _savedTrips.value = updated
-        prefs.edit().putString("saved_trips", gson.toJson(updated)).apply()
+        prefs.edit { putString("saved_trips", gson.toJson(updated)) }
         return true
     }
 
@@ -192,7 +198,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 val new = repository.generateFoodInsights(region, shownFoodNames.toList())
                 shownFoodNames.addAll(new.map { it.name })
-                _foodItems.value = _foodItems.value + new
+                _foodItems.value += new
                 _foodLoadMoreState.value = UiState.Success(Unit)
             } catch (e: Exception) {
                 _foodLoadMoreState.value = UiState.Error(e.message ?: "Failed")
@@ -213,14 +219,14 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun sendChatMessage(message: String) {
         if (message.isBlank()) return
-        _chatMessages.value = _chatMessages.value + ChatMessage(message, true)
+        _chatMessages.value += ChatMessage(message, true)
         _chatLoading.value = true
         viewModelScope.launch {
             try {
                 val reply = repository.chat(message, _chatMessages.value)
-                _chatMessages.value = _chatMessages.value + ChatMessage(reply, false)
+                _chatMessages.value += ChatMessage(reply, false)
             } catch (e: Exception) {
-                _chatMessages.value = _chatMessages.value + ChatMessage("Sorry, couldn't respond. Try again. 🙏", false)
+                _chatMessages.value += ChatMessage("Sorry, couldn't respond. Try again. 🙏", false)
             } finally {
                 _chatLoading.value = false
             }
