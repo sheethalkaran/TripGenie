@@ -9,7 +9,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
 class GeminiRepository {
@@ -20,21 +19,12 @@ class GeminiRepository {
     // ────────────────────────────────────────────────────────────────────────
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
         .build()
 
     private val JSON_MEDIA = "application/json; charset=utf-8".toMediaType()
-
-    // ── Session-level in-memory cache (lives as long as the app process) ─────
-    private val sessionCache = HashMap<String, String>()
-
-    private fun cacheKey(vararg parts: String): String {
-        val raw = parts.joinToString("|")
-        val digest = MessageDigest.getInstance("SHA-256").digest(raw.toByteArray())
-        return digest.joinToString("") { "%02x".format(it) }
-    }
 
     // ── Core HTTP helper ─────────────────────────────────────────────────────
 
@@ -67,16 +57,6 @@ class GeminiRepository {
     // ── Itinerary ────────────────────────────────────────────────────────────
 
     suspend fun generateItinerary(request: ItineraryRequest): ItineraryResult {
-        val key = cacheKey(
-            "itinerary",
-            request.destination,
-            request.durationDays.toString(),
-            request.budget,
-            request.travelerType,
-            request.interests
-        )
-        sessionCache[key]?.let { return parseItinerary(it, request.destination) }
-
         val bodyJson = JSONObject().apply {
             put("destination", request.destination)
             put("durationDays", request.durationDays)
@@ -88,9 +68,7 @@ class GeminiRepository {
 
         val response = post("/itinerary", bodyJson)
         val raw = JSONObject(response).getString("result")
-        val cleaned = cleanJson(raw)
-        sessionCache[key] = cleaned
-        return parseItinerary(cleaned, request.destination)
+        return parseItinerary(cleanJson(raw), request.destination)
     }
 
     private fun parseItinerary(text: String, destination: String): ItineraryResult {
@@ -131,25 +109,6 @@ class GeminiRepository {
     // ── Packing ──────────────────────────────────────────────────────────────
 
     suspend fun generatePackingList(request: PackingRequest): PackingResult {
-        val key = cacheKey(
-            "packing",
-            request.destination,
-            request.weatherType,
-            request.tripDuration.toString(),
-            request.mainActivities
-        )
-        sessionCache[key]?.let { cached ->
-            val arr = JSONArray(cached)
-            return PackingResult(categories = (0 until arr.length()).map { i ->
-                val c = arr.getJSONObject(i)
-                val ia = c.getJSONArray("items")
-                PackingCategory(
-                    c.optString("name", "Category"), c.optString("icon", "📦"),
-                    (0 until ia.length()).map { PackingItem(ia.getJSONObject(it).optString("name", "Item")) }
-                )
-            })
-        }
-
         val bodyJson = JSONObject().apply {
             put("destination", request.destination)
             put("weatherType", request.weatherType)
@@ -159,10 +118,7 @@ class GeminiRepository {
 
         val response = post("/packing", bodyJson)
         val raw = JSONObject(response).getString("result")
-        val cleaned = cleanJson(raw)
-        sessionCache[key] = cleaned
-
-        val arr = JSONArray(cleaned)
+        val arr = JSONArray(cleanJson(raw))
         return PackingResult(categories = (0 until arr.length()).map { i ->
             val c = arr.getJSONObject(i)
             val ia = c.getJSONArray("items")
@@ -176,26 +132,6 @@ class GeminiRepository {
     // ── Food ─────────────────────────────────────────────────────────────────
 
     suspend fun generateFoodInsights(region: String, alreadyShown: List<String> = emptyList()): List<FoodItem> {
-        // Only cache the first-load (no alreadyShown) — "load more" should always be fresh
-        val cacheEnabled = alreadyShown.isEmpty()
-        val key = cacheKey("food", region)
-
-        if (cacheEnabled) {
-            sessionCache[key]?.let { cached ->
-                val arr = JSONArray(cached)
-                return (0 until arr.length()).map { i ->
-                    val o = arr.getJSONObject(i)
-                    FoodItem(
-                        o.optString("name", "Local Dish"),
-                        o.optString("restaurant", "Local Restaurant"),
-                        o.optString("description", "A delicious local specialty."),
-                        o.optString("bestSpot", "Local area"),
-                        o.optString("icon", "🍽️")
-                    )
-                }
-            }
-        }
-
         val bodyJson = JSONObject().apply {
             put("region", region)
             put("alreadyShown", JSONArray(alreadyShown))
@@ -203,11 +139,7 @@ class GeminiRepository {
 
         val response = post("/food", bodyJson)
         val raw = JSONObject(response).getString("result")
-        val cleaned = cleanJson(raw)
-
-        if (cacheEnabled) sessionCache[key] = cleaned
-
-        val arr = JSONArray(cleaned)
+        val arr = JSONArray(cleanJson(raw))
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
             FoodItem(
