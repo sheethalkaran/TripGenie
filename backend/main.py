@@ -33,6 +33,7 @@ MODELS = [
     "gemini-2.0-flash",
     "gemini-1.5-flash",
     "gemini-2.5-flash",
+    "gemini-1.5-flash-8b",
 ]
 
 # ── In-memory cache (survives for process lifetime, TTL = 24 hours) ──────────
