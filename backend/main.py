@@ -99,7 +99,8 @@ async def call_gemini(prompt: str) -> str:
                 model_name=model_name,
                 generation_config=genai.GenerationConfig(
                     temperature=0.3,
-                    max_output_tokens=1500,
+                    max_output_tokens=8192,
+                    response_mime_type="application/json",
                 ),
             )
             response = await model.generate_content_async(prompt)
@@ -117,14 +118,14 @@ async def call_gemini(prompt: str) -> str:
 
 
 def clean_json(raw: str) -> str:
-    # Strip markdown code fences like ```json ... ``` or ``` ... ```
+    # Strip markdown fences: ```json ... ``` or ``` ... ```
     raw = raw.strip()
     if raw.startswith("```"):
-        raw = raw.split("\n", 1)[-1]  # remove first line (```json or ```)
+        raw = raw.split("\n", 1)[-1]
     if raw.endswith("```"):
-        raw = raw.rsplit("```", 1)[0]  # remove trailing ```
+        raw = raw.rsplit("```", 1)[0]
     raw = raw.strip()
-    # Now find the actual JSON start/end
+    # Find actual JSON boundaries
     start = next((i for i, c in enumerate(raw) if c in ('{', '[')), -1)
     end = next((i for i in range(len(raw) - 1, -1, -1) if raw[i] in ('}', ']')), -1)
     if start != -1 and end != -1 and end > start:
