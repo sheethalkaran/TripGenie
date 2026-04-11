@@ -1,8 +1,6 @@
 import os
 import json
-import asyncio
-import hashlib
-import time as _time
+import time
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -27,33 +25,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Model list (only real, working models) ───────────────────────────────────
+# ── Model fallback list ──────────────────────────────────────────────────────
 MODELS = [
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
+    "gemini-2.5-flash-lite-preview-06-17",
     "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-3-flash-preview",
+    "gemini-1.5-flash",
 ]
-
-# ── In-memory cache (survives for process lifetime, TTL = 24 hours) ──────────
-_cache: dict[str, tuple[str, float]] = {}
-CACHE_TTL = 86400  # 24 hours in seconds
-
-
-def cache_get(key: str) -> str | None:
-    if key in _cache:
-        val, ts = _cache[key]
-        if _time.time() - ts < CACHE_TTL:
-            return val
-        del _cache[key]
-    return None
-
-
-def cache_set(key: str, val: str) -> None:
-    _cache[key] = (val, _time.time())
-
-
-def make_cache_key(data: str) -> str:
-    return hashlib.sha256(data.encode()).hexdigest()
 
 
 # ── Request Models ───────────────────────────────────────────────────────────
@@ -89,25 +68,25 @@ class ChatRequest(BaseModel):
     history: list[ChatMessage] = []
 
 
-# ── Gemini async helper ──────────────────────────────────────────────────────
+# ── Gemini helper ────────────────────────────────────────────────────────────
 
-async def call_gemini(prompt: str) -> str:
+def call_gemini(prompt: str) -> str:
     errors = []
     for model_name in MODELS:
         try:
             model = genai.GenerativeModel(
                 model_name=model_name,
                 generation_config=genai.GenerationConfig(
-                    temperature=0.3,
-                    max_output_tokens=1500,
+                    temperature=0.7,
+                    max_output_tokens=4096,
                 ),
             )
-            response = await model.generate_content_async(prompt)
+            response = model.generate_content(prompt)
             return response.text
         except Exception as e:
             msg = str(e)
             if "429" in msg or "quota" in msg.lower():
-                await asyncio.sleep(1)
+                time.sleep(5)
             errors.append(f"{model_name}: {msg[:100]}")
             continue
     raise HTTPException(
@@ -138,10 +117,6 @@ async def health():
 
 @app.post("/itinerary")
 async def generate_itinerary(req: ItineraryRequest):
-    cache_key = make_cache_key(req.model_dump_json())
-    if cached := cache_get(cache_key):
-        return {"result": cached}
-
     act_count = 4 if req.durationDays <= 1 else (5 if req.durationDays == 2 else 6)
     prompt = f"""Create a {req.durationDays}-day itinerary for {req.destination}.
 Traveler:{req.travelerType}|Budget:{req.budget}|Interests:{req.interests}
@@ -151,45 +126,33 @@ Output ONLY JSON no markdown:
 
 IMPORTANT: {req.durationDays} days, {act_count} activities/day, REAL GPS lat/lng for {req.destination} (not 0.0), budgetBreakdown sums=100."""
 
-    raw = await call_gemini(prompt)
+    raw = call_gemini(prompt)
     cleaned = clean_json(raw)
     try:
         json.loads(cleaned)
     except Exception:
         raise HTTPException(status_code=500, detail=f"Invalid JSON from model: {cleaned[:300]}")
-
-    cache_set(cache_key, cleaned)
     return {"result": cleaned}
 
 
 @app.post("/packing")
 async def generate_packing(req: PackingRequest):
-    cache_key = make_cache_key(req.model_dump_json())
-    if cached := cache_get(cache_key):
-        return {"result": cached}
-
     prompt = f"""Packing list for: {req.destination}, {req.weatherType}, {req.tripDuration} days, activities: {req.mainActivities}
 Respond ONLY with valid JSON array (no markdown):
 [{{"name":"Clothing","icon":"👕","items":[{{"name":"item"}}]}},{{"name":"Footwear","icon":"👟","items":[{{"name":"item"}}]}},{{"name":"Toiletries","icon":"🧴","items":[{{"name":"item"}}]}},{{"name":"Electronics","icon":"📱","items":[{{"name":"item"}}]}},{{"name":"Documents","icon":"📄","items":[{{"name":"item"}}]}},{{"name":"Health","icon":"💊","items":[{{"name":"item"}}]}}]
 6-10 specific items per category for {req.weatherType} weather and {req.mainActivities}."""
 
-    raw = await call_gemini(prompt)
+    raw = call_gemini(prompt)
     cleaned = clean_json(raw)
     try:
         json.loads(cleaned)
     except Exception:
         raise HTTPException(status_code=500, detail=f"Invalid JSON from model: {cleaned[:300]}")
-
-    cache_set(cache_key, cleaned)
     return {"result": cleaned}
 
 
 @app.post("/food")
 async def generate_food(req: FoodRequest):
-    cache_key = make_cache_key(req.model_dump_json())
-    if cached := cache_get(cache_key):
-        return {"result": cached}
-
     exclude = f"Exclude: {', '.join(req.alreadyShown)}." if req.alreadyShown else ""
     prompt = f"""List 6 famous authentic local dishes from {req.region} that tourists must try. {exclude}
 
@@ -203,14 +166,12 @@ Rules:
 - Restaurant must be a real local restaurant name from {req.region}
 - {exclude}"""
 
-    raw = await call_gemini(prompt)
+    raw = call_gemini(prompt)
     cleaned = clean_json(raw)
     try:
         json.loads(cleaned)
     except Exception:
         raise HTTPException(status_code=500, detail=f"Invalid JSON from model: {cleaned[:300]}")
-
-    cache_set(cache_key, cleaned)
     return {"result": cleaned}
 
 
@@ -225,5 +186,5 @@ async def chat(req: ChatRequest):
         "Give practical travel advice in 3-4 sentences.\n"
         f"{hist}\nUser: {req.message}"
     )
-    reply = await call_gemini(prompt)
+    reply = call_gemini(prompt)
     return {"reply": reply}
